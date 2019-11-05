@@ -77,6 +77,28 @@ class BaseDataset(Dataset):
         return feat, label
 
 
+def _collate_fn(batch):
+    def seq_length_(p):
+        return len(p[0])
+
+    seq_lengths = [len(s[0]) for s in batch]
+
+    max_seq_smaple = max(batch, key=seq_length_)[0]
+
+    max_seq_size = max_seq_smaple.size(0)
+
+    feat_size = max_seq_smaple.size(1)
+    batch_size = len(batch)
+
+    seqs = torch.zeros(batch_size, max_seq_size, feat_size)
+
+    for x in range(batch_size):
+        sample = batch[x]
+        tensor = sample[0]
+
+
+
+
 class BaseDataLoader(threading.Thread):
     def __init__(self, dataset, queue, batch_size, thread_id):
         threading.Thread.__init__(self)
@@ -87,6 +109,26 @@ class BaseDataLoader(threading.Thread):
         self.batch_size = batch_size
         self.dataset_count = dataset_count()
         self.thread_id = thread_id
+
+    def count(self):
+        return math.ceil(self.dataset_count / self.batch_size)
+
+    def create_empty_batch(self):
+        seqs = torch.zeros(0, 0, 0)
+        target = torch.zeros(0).to(torch.long)
+        seqs_lengths = list()
+        return seqs, target, seqs_lengths
+
+    def run(self):
+        logger.debug('loader %d start' % (self.thread_id))
+        while True:
+            items = list()
+
+            for i in range(self.batch_size):
+                if self.index >= self.dataset_count:
+                    break
+
+                items.append(self.dataset.getitem(self.index))
 
 
 class MultiLoader():
