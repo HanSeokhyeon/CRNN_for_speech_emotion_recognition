@@ -12,7 +12,8 @@ Simple implementation of CRNN for speech emotion recognition
 
 ### Train
 
-* python main.py
+* python main.pycommRE
+
 
 ### Test
 
