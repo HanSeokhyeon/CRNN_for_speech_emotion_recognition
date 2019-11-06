@@ -198,7 +198,7 @@ def main():
     parser.add_argument('--bidirectional', default=True, action='store_true', help='use bidirectional RNN (default: False')
     parser.add_argument('--batch_size', type=int, default=16, help='batch size in training (default: 32')
     parser.add_argument('--workers', type=int, default=4, help='number of workers in dataset loader (default: 4)')
-    parser.add_argument('--max_epochs', type=int, default=100, help='number of max epochs in training (default: 10)')
+    parser.add_argument('--max_epochs', type=int, default=10, help='number of max epochs in training (default: 10)')
     parser.add_argument('--lr', type=float, default=1e-04, help='learning rate (default: 0.0001)')
     parser.add_argument('--no_cuda', action='store_true', default=False, help='disables CUDA training')
     parser.add_argument('--seed', type=int, default=1, help='random seed (default: 1)')
@@ -239,7 +239,7 @@ def main():
 
     wav_paths = [os.path.join('./dataset/wav', fname) for fname in os.listdir('./dataset/wav')]
 
-    best_acc = 0
+    best_loss = 1e10
     begin_epoch = 0
     patient_count = 0
 
@@ -271,10 +271,10 @@ def main():
 
         valid_loader.join()
 
-        best_model = (eval_acc > best_acc)
+        best_model = (eval_loss < best_loss)
 
         if best_model:
-            best_acc = eval_acc
+            best_loss = eval_loss
             torch.save(model.state_dict(), './save_model/best_model.pt')
             patient_count = 0
         else:
