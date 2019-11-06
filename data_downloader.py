@@ -16,7 +16,7 @@ limitations under the License.
 
 """
 
-import requests, zipfile, io, os
+import requests, zipfile, io, os, shutil
 from loader import logger
 
 def data_download():
@@ -24,9 +24,16 @@ def data_download():
         logger.info("emo-db already exist")
         return
     else:
+        logger.info("emo-db downloading")
         r = requests.get('http://emodb.bilderbar.info/download/download.zip')
         z = zipfile.ZipFile(io.BytesIO(r.content))
         z.extractall('./dataset')
+        shutil.rmtree('./dataset/lablaut')
+        shutil.rmtree('./dataset/labsilb')
+        shutil.rmtree('./dataset/silb')
+        os.remove('./dataset/erkennung.txt')
+        os.remove('./dataset/erklaerung.txt')
+
 
 
 if __name__ == '__main__':

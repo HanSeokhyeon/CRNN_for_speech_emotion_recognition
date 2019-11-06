@@ -17,7 +17,9 @@ limitations under the License.
 """
 
 import math
+import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 from .baseRNN import BaseRNN
 
@@ -51,15 +53,23 @@ class RNN(BaseRNN):
 
     """
 
-    def __init__(self, feature_size, hidden_size,
+    def __init__(self, feature_size, hidden_size, output_size,
                  input_dropout_p=0, dropout_p=0,
                  n_layers=3, bidirectional=False, rnn_cell='gru', variable_lengths=False):
         super(RNN, self).__init__(hidden_size, input_dropout_p, dropout_p, n_layers, rnn_cell)
 
         self.variable_lengths = variable_lengths
-
+        self.hidden_size = hidden_size
+        self.output_size = output_size
         self.rnn = self.rnn_cell(feature_size, hidden_size, n_layers,
                                  batch_first=True, bidirectional=bidirectional, dropout=dropout_p)
+        self.bidirectional = bidirectional
+
+        if self.bidirectional:
+            self.hidden_size = hidden_size * 2
+        self.hidden_neuron = 300
+        self.out1 = nn.Linear(self.hidden_size, self.hidden_neuron)
+        self.out2 = nn.Linear(self.hidden_neuron, self.output_size)
 
     def forward(self, input_var, input_lengths=None):
         """
@@ -75,9 +85,20 @@ class RNN(BaseRNN):
             - **hidden** (num_layers * num_directions, batch, hidden_size): variable containing the features in the hidden state h
         """
 
+
+
         if self.training:
             self.rnn.flatten_parameters()
 
         output, hidden = self.rnn(input_var)
+        if self.bidirectional:
+            output_forward = output.contiguous()[:, -1, :self.hidden_size//2]
+            output_reverse = output.contiguous()[:, 0, self.hidden_size//2:]
+            output = torch.cat((output_forward, output_reverse), dim=1)
+        else:
+            output = output.contiguous()[:, -1, :]
+        output = self.out1(output)
+        output = self.out2(output)
+        predicted_softmax = F.log_softmax(output, dim=1)
 
-        return output, hidden
+        return predicted_softmax

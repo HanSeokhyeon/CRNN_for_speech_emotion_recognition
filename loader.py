@@ -20,6 +20,7 @@ import sys
 import math
 import wavio
 import torch
+import random
 import threading
 import logging
 from torch.utils.data import Dataset
@@ -92,22 +93,29 @@ def _collate_fn(batch):
 
     seqs = torch.zeros(batch_size, max_seq_size, feat_size)
 
+    targets = torch.zeros(batch_size).to(torch.long)
+
     for x in range(batch_size):
         sample = batch[x]
         tensor = sample[0]
+        target = sample[1]
+        seq_length = tensor.size(0)
+        seqs[x].narrow(0, 0, seq_length).copy_(tensor)
+        target = torch.LongTensor([target])
+        targets.narrow(0, x, 1).copy_(target)
 
-
+    return seqs, targets, seq_lengths
 
 
 class BaseDataLoader(threading.Thread):
     def __init__(self, dataset, queue, batch_size, thread_id):
         threading.Thread.__init__(self)
-        self.collate_fn = collate_fn
+        self.collate_fn = _collate_fn
         self.dataset = dataset
         self.queue = queue
         self.index = 0
         self.batch_size = batch_size
-        self.dataset_count = dataset_count()
+        self.dataset_count = dataset.count()
         self.thread_id = thread_id
 
     def count(self):
@@ -129,6 +137,18 @@ class BaseDataLoader(threading.Thread):
                     break
 
                 items.append(self.dataset.getitem(self.index))
+                self.index += 1
+
+            if len(items) == 0:
+                batch = self.create_empty_batch()
+                self.queue.put(batch)
+                break
+
+            random.shuffle(items)
+
+            batch = self.collate_fn(items)
+            self.queue.put(batch)
+        logger.debug('loader %d stop' % (self.thread_id))
 
 
 class MultiLoader():
@@ -141,3 +161,11 @@ class MultiLoader():
 
         for i in range(self.worker_size):
             self.loader.append(BaseDataLoader(self.dataest_list[i], self.queue, self.batch_size, i))
+
+    def start(self):
+        for i in range(self.worker_size):
+            self.loader[i].start()
+
+    def join(self):
+        for i in range(self.worker_size):
+            self.loader[i].join()

@@ -73,6 +73,6 @@ class CRNN(nn.Module):
 
         x = self.cnn(input_variable, input_lengths)
 
-        result = self.rnn(x)
+        output = self.rnn(x)
 
-        return result[0]
+        return output
