@@ -58,15 +58,6 @@ class CNN(nn.Module):
         MIT License
         """
 
-        # self.conv = nn.Sequential(
-        #     nn.Conv2d(1, 32, kernel_size=(41, 11), stride=(2, 2), padding=(20, 5)),
-        #     nn.BatchNorm2d(32),
-        #     nn.Hardtanh(0, 20, inplace=True),
-        #     nn.Conv2d(32, 32, kernel_size=(21, 11), stride=(2, 1), padding=(10, 5)),
-        #     nn.BatchNorm2d(32),
-        #     nn.Hardtanh(0, 20, inplace=True),
-        # )
-
         self.conv = nn.Sequential(
             nn.Conv2d(1, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)),
             nn.BatchNorm2d(64),
@@ -94,35 +85,11 @@ class CNN(nn.Module):
             nn.BatchNorm2d(256),
             nn.Hardtanh(0, 20, inplace=True),
             nn.MaxPool2d(kernel_size=(2, 2), stride=(2, 2)),
-
-            # nn.Conv2d(256, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)),
-            # nn.BatchNorm2d(512),
-            # nn.Hardtanh(0, 20, inplace=True),
-            # nn.Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)),
-            # nn.BatchNorm2d(512),
-            # nn.Hardtanh(0, 20, inplace=True),
-            # nn.Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)),
-            # nn.BatchNorm2d(512),
-            # nn.Hardtanh(0, 20, inplace=True),
-            # nn.MaxPool2d(kernel_size=(2, 2), stride=(2, 2)),
-
-            # nn.Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)),
-            # nn.BatchNorm2d(512),
-            # nn.Hardtanh(0, 20, inplace=True),
-            # nn.Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)),
-            # nn.BatchNorm2d(512),
-            # nn.Hardtanh(0, 20, inplace=True),
-            # nn.Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)),
-            # nn.BatchNorm2d(512),
-            # nn.Hardtanh(0, 20, inplace=True),
-            # nn.MaxPool2d(kernel_size=(2, 2), stride=(2, 2)),
         )
 
         feature_size = math.floor(feature_size / 2)
         feature_size = math.ceil(feature_size / 2)
         feature_size = math.ceil(feature_size / 2)
-        # feature_size = math.ceil(feature_size / 2)
-        # feature_size = math.ceil(feature_size / 2)
         self.feature_size = feature_size * 256
 
     def forward(self, input_var, input_lengths=None):
