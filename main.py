@@ -27,6 +27,7 @@ import torch.optim as optim
 from loader import *
 from models import CRNN, CNN, RNN
 from data_downloader import data_download
+from result import *
 
 DATASET_PATH = './dataset'
 
@@ -187,7 +188,6 @@ def split_dataset(config, wav_paths, dataset_ratio=[0.7, 0.1, 0.2]):
     return train_batch_num, train_dataset_list, valid_dataset, test_dataset
 
 
-
 def main():
     parser = argparse.ArgumentParser(description='Speech Emotion Recognition')
     parser.add_argument('--hidden_size', type=int, default=512, help='hidden size of model (default: 256)')
@@ -196,9 +196,9 @@ def main():
     parser.add_argument('--patience', type=int, default=10, help='times to be continue after best model')
     parser.add_argument('--dropout', type=float, default=0.2, help='dropout rate in training (default: 0.2')
     parser.add_argument('--bidirectional', default=True, action='store_true', help='use bidirectional RNN (default: False')
-    parser.add_argument('--batch_size', type=int, default=16, help='batch size in training (default: 32')
+    parser.add_argument('--batch_size', type=int, default=8, help='batch size in training (default: 32')
     parser.add_argument('--workers', type=int, default=4, help='number of workers in dataset loader (default: 4)')
-    parser.add_argument('--max_epochs', type=int, default=10, help='number of max epochs in training (default: 10)')
+    parser.add_argument('--max_epochs', type=int, default=3, help='number of max epochs in training (default: 10)')
     parser.add_argument('--lr', type=float, default=1e-04, help='learning rate (default: 0.0001)')
     parser.add_argument('--no_cuda', action='store_true', default=False, help='disables CUDA training')
     parser.add_argument('--seed', type=int, default=1, help='random seed (default: 1)')
@@ -243,6 +243,8 @@ def main():
     begin_epoch = 0
     patient_count = 0
 
+    loss_acc = [[], [], [], []]
+
     train_batch_num, train_dataset_list, valid_dataset, test_dataset = split_dataset(args, wav_paths, dataset_ratio=[0.7, 0.1, 0.2])
 
     logger.info('start')
@@ -261,6 +263,9 @@ def main():
 
         train_loader.join()
 
+        loss_acc[0].append(train_loss)
+        loss_acc[1].append(train_acc)
+
         valid_queue = queue.Queue(args.workers * 2)
 
         valid_loader = BaseDataLoader(valid_dataset, valid_queue, args.batch_size, 0)
@@ -270,6 +275,9 @@ def main():
         logger.info('Epoch %d (Evaluate) Loss %0.4f Acc %0.4f' % (epoch, eval_loss, eval_acc))
 
         valid_loader.join()
+
+        loss_acc[2].append(eval_loss)
+        loss_acc[3].append(eval_acc)
 
         best_model = (eval_loss < best_loss)
 
@@ -294,6 +302,9 @@ def main():
     logger.info('Epoch %d (Test) Loss %0.4f Acc %0.4f' % (epoch, test_loss, test_acc))
 
     test_loader.join()
+
+    save_data(loss_acc, test_loss, test_acc)
+    plot_data(loss_acc, test_loss, test_acc)
 
     return 0
 

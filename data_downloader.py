@@ -21,7 +21,7 @@ from loader import logger
 
 def data_download():
     if os.path.isdir('./dataset/wav'):
-        logger.info("emo-db already exist")
+        logger.info("emo-db already exists")
         return
     else:
         logger.info("emo-db downloading")
