@@ -4,20 +4,15 @@
 
 Simple implementation of CRNN for speech emotion recognition
 
-## Summary
 
 ### Dataset
 
 * [Emo-db](http://emodb.bilderbar.info/docu/)
 
-### Train
+### Run
 
-* python main.pycommRE
+* python3 main.py
 
-
-### Test
-
-*
 
 ## Author
 

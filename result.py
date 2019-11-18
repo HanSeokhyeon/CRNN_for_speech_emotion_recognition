@@ -42,7 +42,7 @@ def plot_data(loss_acc, test_loss, test_acc):
     plt.title("Train data")
 
     ax1.set_xlabel("Epoch")
-    ax1.set_xticks(range(data.shape[1]))
+    # ax1.set_xticks(range(data.shape[1]))
 
     ax1.set_ylabel("Loss")
 

@@ -193,12 +193,11 @@ def main():
     parser.add_argument('--hidden_size', type=int, default=512, help='hidden size of model (default: 256)')
     parser.add_argument('--layer_size', type=int, default=3, help='number of layers of model (default: 3)')
     parser.add_argument('--n_class', type=int, default=7, help='number of classes of data (default: 7)')
-    parser.add_argument('--patience', type=int, default=10, help='times to be continue after best model')
     parser.add_argument('--dropout', type=float, default=0.2, help='dropout rate in training (default: 0.2')
     parser.add_argument('--bidirectional', default=True, action='store_true', help='use bidirectional RNN (default: False')
     parser.add_argument('--batch_size', type=int, default=8, help='batch size in training (default: 32')
     parser.add_argument('--workers', type=int, default=4, help='number of workers in dataset loader (default: 4)')
-    parser.add_argument('--max_epochs', type=int, default=3, help='number of max epochs in training (default: 10)')
+    parser.add_argument('--max_epochs', type=int, default=30, help='number of max epochs in training (default: 10)')
     parser.add_argument('--lr', type=float, default=1e-04, help='learning rate (default: 0.0001)')
     parser.add_argument('--no_cuda', action='store_true', default=False, help='disables CUDA training')
     parser.add_argument('--seed', type=int, default=1, help='random seed (default: 1)')
@@ -230,8 +229,6 @@ def main():
     optimizer = optim.Adam(model.module.parameters(), lr=args.lr)
     criterion = nn.CrossEntropyLoss(reduction='sum').to(device)
 
-    # bind_model(model, optimizer)
-
     if args.mode != 'train':
         return
 
@@ -239,9 +236,8 @@ def main():
 
     wav_paths = [os.path.join('./dataset/wav', fname) for fname in os.listdir('./dataset/wav')]
 
-    best_loss = 1e10
+    best_acc = 0
     begin_epoch = 0
-    patient_count = 0
 
     loss_acc = [[], [], [], []]
 
@@ -279,17 +275,12 @@ def main():
         loss_acc[2].append(eval_loss)
         loss_acc[3].append(eval_acc)
 
-        best_model = (eval_loss < best_loss)
+        best_model = (eval_acc > best_acc)
 
         if best_model:
-            best_loss = eval_loss
+            best_acc = eval_acc
             torch.save(model.state_dict(), './save_model/best_model.pt')
-            patient_count = 0
-        else:
-            patient_count += 1
-
-        if patient_count > args.patience:
-            break
+            save_epoch = epoch
 
     model.load_state_dict(torch.load('./save_model/best_model.pt'))
 
@@ -299,7 +290,7 @@ def main():
     test_loader.start()
 
     test_loss, test_acc = evaluate(model, test_loader, test_queue, criterion, device)
-    logger.info('Epoch %d (Test) Loss %0.4f Acc %0.4f' % (epoch, test_loss, test_acc))
+    logger.info('Epoch %d (Test) Loss %0.4f Acc %0.4f' % (save_epoch, test_loss, test_acc))
 
     test_loader.join()
 

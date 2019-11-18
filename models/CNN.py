@@ -65,6 +65,9 @@ class CNN(nn.Module):
             nn.Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)),
             nn.BatchNorm2d(64),
             nn.Hardtanh(0, 20, inplace=True),
+            nn.Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)),
+            nn.BatchNorm2d(64),
+            nn.Hardtanh(0, 20, inplace=True),
             nn.MaxPool2d(kernel_size=(2, 2), stride=(2, 2)),
 
             nn.Conv2d(64, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)),
@@ -76,9 +79,6 @@ class CNN(nn.Module):
             nn.MaxPool2d(kernel_size=(2, 2), stride=(2, 2)),
 
             nn.Conv2d(128, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)),
-            nn.BatchNorm2d(256),
-            nn.Hardtanh(0, 20, inplace=True),
-            nn.Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)),
             nn.BatchNorm2d(256),
             nn.Hardtanh(0, 20, inplace=True),
             nn.Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)),
