@@ -71,7 +71,7 @@ class CRNN(nn.Module):
             - **hidden** (num_layers * num_directions, batch, hidden_size): variable containing the features in the hidden state h
         """
 
-        x = self.cnn(input_variable, input_lengths)
+        x = self.cnn(input_variable)
 
         output = self.rnn(x)
 

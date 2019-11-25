@@ -92,7 +92,7 @@ class CNN(nn.Module):
         feature_size = math.ceil(feature_size / 2)
         self.feature_size = feature_size * 256
 
-    def forward(self, input_var, input_lengths=None):
+    def forward(self, input_var):
         """
         Applies a multi-layer RNN to an input sequence.
 
