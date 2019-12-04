@@ -68,7 +68,8 @@ class GoogLeNet(nn.Module):
         # feature_size = math.ceil(feature_size / 2)
         self.feature_size = feature_size * 256
 
-        self.a3 = Inception(64,  32,  48, 64, 8, 16, 16)
+        self.a3 = Inception(64,  32, 48, 64, 8, 16, 16)
+        self.aa3 = Inception(128, 32, 48, 64, 8, 16, 16)
         self.b3 = Inception(128, 64, 96, 128, 16, 32, 32)
 
         self.maxpool = nn.MaxPool2d(3, stride=2, padding=1)
@@ -78,8 +79,10 @@ class GoogLeNet(nn.Module):
         out = self.pre_layers(x)
         out = self.a3(out)
         out = self.maxpool(out)
-        out = self.b3(out)
+        out = self.aa3(out)
+        out = self.aa3(out)
         out = self.maxpool(out)
+        out = self.b3(out)
         # out = self.maxpool(out)
         # out = self.a4(out)
         # out = self.b4(out)

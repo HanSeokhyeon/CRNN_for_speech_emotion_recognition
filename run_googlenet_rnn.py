@@ -195,7 +195,7 @@ def main():
     parser.add_argument('--n_class', type=int, default=7, help='number of classes of data (default: 7)')
     parser.add_argument('--dropout', type=float, default=0.2, help='dropout rate in training (default: 0.2')
     parser.add_argument('--bidirectional', default=True, action='store_true', help='use bidirectional RNN (default: False')
-    parser.add_argument('--batch_size', type=int, default=4, help='batch size in training (default: 32')
+    parser.add_argument('--batch_size', type=int, default=2, help='batch size in training (default: 32')
     parser.add_argument('--workers', type=int, default=4, help='number of workers in dataset loader (default: 4)')
     parser.add_argument('--max_epochs', type=int, default=30, help='number of max epochs in training (default: 10)')
     parser.add_argument('--lr', type=float, default=1e-04, help='learning rate (default: 0.0001)')
