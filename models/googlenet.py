@@ -64,7 +64,7 @@ class GoogLeNet(nn.Module):
 
         feature_size = math.ceil(feature_size / 2)
         feature_size = math.ceil(feature_size / 2)
-        # feature_size = math.ceil(feature_size / 2)
+        feature_size = math.ceil(feature_size / 2)
         # feature_size = math.ceil(feature_size / 2)
         self.feature_size = feature_size * 256
 
@@ -82,16 +82,9 @@ class GoogLeNet(nn.Module):
         out = self.aa3(out)
         out = self.aa3(out)
         out = self.maxpool(out)
+        out = self.aa3(out)
+        out = self.maxpool(out)
         out = self.b3(out)
-        # out = self.maxpool(out)
-        # out = self.a4(out)
-        # out = self.b4(out)
-        # out = self.c4(out)
-        # out = self.d4(out)
-        # out = self.e4(out)
-        # out = self.maxpool(out)
-        # out = self.a5(out)
-        # out = self.b5(out)
 
         out = out.transpose(1, 2)
         out = out.contiguous()
