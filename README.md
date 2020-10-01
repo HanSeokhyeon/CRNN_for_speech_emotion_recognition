@@ -20,7 +20,6 @@ Simple implementation of CRNN for speech emotion recognition
 
 * python3 main.py
 
-
 ## Author
 
 Han Seokhyeon
